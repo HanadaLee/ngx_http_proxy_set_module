@@ -17,7 +17,7 @@ typedef struct {
 
 
 typedef struct {
-    ngx_array_t              *vars;
+    ngx_array_t               *vars;
 } ngx_http_proxy_var_set_loc_conf_t;
 
 
