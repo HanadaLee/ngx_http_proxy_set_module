@@ -33,7 +33,7 @@ static char *ngx_http_proxy_var_set_merge_loc_conf(ngx_conf_t *cf,
 static ngx_command_t  ngx_http_proxy_var_set_commands[] = {
 
     { ngx_string("proxy_var_set"),
-      NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE2,
+      NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE23,
       ngx_http_proxy_var_set,
       NGX_HTTP_LOC_CONF_OFFSET,
       0,
@@ -245,6 +245,7 @@ ngx_http_proxy_var_set(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         }
 
         pv->filter = ccv.complex_value;
+
     } else {
         pv->negative = 0;
         pv->filter = NULL;
