@@ -72,7 +72,7 @@ ngx_module_t  ngx_http_proxy_var_set_module = {
 };
 
 
-static ngx_int_t
+ngx_int_t
 ngx_http_proxy_var_set_handler(ngx_http_request_t *r)
 {
     ngx_str_t                            val;
