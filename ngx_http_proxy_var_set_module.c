@@ -472,6 +472,7 @@ ngx_http_proxy_var_set_create_loc_conf(ngx_conf_t *cf)
     }
 
     conf->vars = NGX_CONF_UNSET_PTR;
+    conf->grpc_vars = NGX_CONF_UNSET_PTR;
 
     return conf;
 }
