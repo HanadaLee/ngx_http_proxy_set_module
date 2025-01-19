@@ -121,10 +121,12 @@ ngx_http_proxy_var_set_handler(ngx_http_request_t *r)
 
             if (val.len == 0 || (val.len == 1 && val.data[0] == '0')) {
                 if (!pv->negative) {
+                    pv++;
                     continue;
                 }
             } else {
                 if (pv->negative) {
+                    pv++;
                     continue;
                 }
             }
