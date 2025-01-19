@@ -4,7 +4,7 @@
  */
 
 
-#include "ngx_http_log_var_set_module.h"
+#include "ngx_http_proxy_var_set_module.h"
 
 
 typedef struct {
