@@ -18,7 +18,7 @@ index c69a476..94196b8 100644
                  }
              }
  
-+#if (NGX_HTTP_UPSTREAM_LOG)
++#if (NGX_HTTP_PROXY_VAR_SET)
 +            if (ngx_http_proxy_var_set_handler(r) != NGX_OK) {
 +                return NGX_ERROR;
 +            }

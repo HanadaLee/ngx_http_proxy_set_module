@@ -42,7 +42,7 @@ To use theses modules, configure your nginx branch with `--add-module=/path/to/n
 
 ## proxy_var_set
 
-**Syntax:** *proxy_var_set $variable value;*
+**Syntax:** *proxy_var_set $variable value [if=condition];*
 
 **Default:** *-*
 
