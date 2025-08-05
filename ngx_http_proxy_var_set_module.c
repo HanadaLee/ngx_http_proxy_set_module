@@ -487,8 +487,9 @@ ngx_http_proxy_var_set_merge_loc_conf(ngx_conf_t *cf,
     ngx_http_proxy_var_set_loc_conf_t  *prev = parent;
     ngx_http_proxy_var_set_loc_conf_t  *conf = child;
 
-    ngx_http_proxy_var_set_variable_t  *pvars, *cvars, *new_var;
+    ngx_http_proxy_var_set_variable_t  *pvars, *cvars, *nvar;
     ngx_uint_t                          i, j, found;
+    ngx_uint_t                          cvars_nelts;
 
     if (conf->vars == NGX_CONF_UNSET_PTR) {
         conf->vars = (prev->vars == NGX_CONF_UNSET_PTR) ? NULL : prev->vars;
@@ -496,13 +497,12 @@ ngx_http_proxy_var_set_merge_loc_conf(ngx_conf_t *cf,
     } else if (prev->vars != NGX_CONF_UNSET_PTR && prev->vars != NULL) {
 
         pvars = prev->vars->elts;
-        cvars = conf->vars->elts;
-
+        cvars_nelts = conf->vars->nelts;
         for (i = 0; i < prev->vars->nelts; i++) {
-
+            cvars = conf->vars->elts;
             found = 0;
 
-            for (j = 0; j < conf->vars->nelts; j++) {
+            for (j = 0; j < cvars_nelts; j++) {
                 if (cvars[j].index == pvars[i].index) {
                     found = 1;
                     break;
@@ -510,30 +510,28 @@ ngx_http_proxy_var_set_merge_loc_conf(ngx_conf_t *cf,
             }
 
             if (!found) {
-
-                new_var = ngx_array_push(conf->vars);
-                if (new_var == NULL) {
+                nvar = ngx_array_push(conf->vars);
+                if (nvar == NULL) {
                     return NGX_CONF_ERROR;
                 }
 
-                *new_var = pvars[i];
+                *nvar = pvars[i];
             }
         }
     }
 
     if (conf->grpc_vars == NGX_CONF_UNSET_PTR) {
-        conf->grpc_vars = (prev->vars == NGX_CONF_UNSET_PTR) ? NULL : prev->vars;
+        conf->grpc_vars = (prev->grpc_vars == NGX_CONF_UNSET_PTR) ? NULL : prev->grpc_vars;
 
-    } else if (prev->vars != NGX_CONF_UNSET_PTR && prev->vars != NULL) {
+    } else if (prev->grpc_vars != NGX_CONF_UNSET_PTR && prev->grpc_vars != NULL) {
 
-        pvars = prev->vars->elts;
-        cvars = conf->grpc_vars->elts;
-
-        for (i = 0; i < prev->vars->nelts; i++) {
-
+        pvars = prev->grpc_vars->elts;
+        cvars_nelts = conf->grpc_vars->nelts;
+        for (i = 0; i < prev->grpc_vars->nelts; i++) {
+            cvars = conf->grpc_vars->elts;
             found = 0;
 
-            for (j = 0; j < conf->grpc_vars->nelts; j++) {
+            for (j = 0; j < cvars_nelts; j++) {
                 if (cvars[j].index == pvars[i].index) {
                     found = 1;
                     break;
@@ -542,12 +540,12 @@ ngx_http_proxy_var_set_merge_loc_conf(ngx_conf_t *cf,
 
             if (!found) {
 
-                new_var = ngx_array_push(conf->grpc_vars);
-                if (new_var == NULL) {
+                nvar = ngx_array_push(conf->grpc_vars);
+                if (nvar == NULL) {
                     return NGX_CONF_ERROR;
                 }
 
-                *new_var = pvars[i];
+                *nvar = pvars[i];
             }
         }
     }
