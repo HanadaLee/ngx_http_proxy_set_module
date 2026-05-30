@@ -1,6 +1,6 @@
 # Name
 
-`ngx_http_proxy_var_set_module` allows setting the variable to the given value during processing of proxy response.
+`ngx_http_proxy_var_set_module` allows setting variables during the proxy response header phase.
 
 # Table of Content
 
@@ -36,7 +36,12 @@ server {
 
 # Installation
 
-To use theses modules, configure your nginx branch with `--add-module=/path/to/ngx_http_proxy_var_set_module`.
+This module depends on `ngx_http_proxy_filter_module`; add the proxy filter module first:
+
+```sh
+./configure --add-module=/path/to/ngx_http_proxy_filter_module \
+            --add-module=/path/to/ngx_http_proxy_var_set_module
+```
 
 # Directives
 
@@ -48,7 +53,7 @@ To use theses modules, configure your nginx branch with `--add-module=/path/to/n
 
 **Context:** *http, server, location*
 
-Sets the request variable to the given value during processing of proxy response. The value may contain variables from request or response, such as $upstream_http_*.
+Sets the request variable to the given value during the proxy response header phase. The value may contain variables from request or response, such as `$upstream_http_*`.
 These directives are inherited from the previous configuration level only when there is no directive for the same variable defined at the current level.
 
 # Author
