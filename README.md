@@ -9,6 +9,7 @@
 - [Status](#status)
 - [Synopsis](#synopsis)
 - [Installation](#installation)
+- [Conditional syntax](#conditional-syntax)
 - [Directives](#directives)
   - [proxy\_var\_set](#proxy_var_set)
 - [Author](#author)
@@ -27,7 +28,10 @@ server {
 
     location / {
         set $no_cache "";
-        proxy_var_set $no_cache $upstream_http_custom_header1;
+        condition has_no_cache is_not_empty $upstream_http_custom_header1;
+        when has_no_cache {
+            proxy_var_set $no_cache $upstream_http_custom_header1;
+        }
         proxy_no_cache $no_cache;
         proxy_pass http://example.upstream.com;
     }
@@ -43,15 +47,21 @@ This module depends on `ngx_http_proxy_filter_module`; add the proxy filter modu
             --add-module=/path/to/ngx_http_proxy_var_set_module
 ```
 
+To enable named conditions, add `ngx_condition_module` statically in the same nginx configuration.
+
+# Conditional syntax
+
+Conditional syntax is selected at compile time. With `ngx_condition_module`, place `proxy_var_set` inside an `http`, `server`, or `location` `when` block; `if=` and `if!=` are rejected. Without it, `when` is unavailable and legacy `if=`/`if!=` remain supported. A rule whose condition does not match is skipped so the next definition of the same variable can be evaluated.
+
 # Directives
 
 ## proxy_var_set
 
-**Syntax:** *proxy_var_set $variable value [if=condition];*
+**Syntax:** *proxy_var_set $variable value;*
 
 **Default:** *-*
 
-**Context:** *http, server, location*
+**Context:** *http, server, location, http when, server when, location when*
 
 Sets the request variable to the given value during the proxy response header phase. The value may contain variables from request or response, such as `$upstream_http_*`.
 These directives are inherited from the previous configuration level only when there is no directive for the same variable defined at the current level.
