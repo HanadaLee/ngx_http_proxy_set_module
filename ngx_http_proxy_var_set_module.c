@@ -144,6 +144,7 @@ ngx_http_proxy_var_set_filter(ngx_http_request_t *r,
                     pv++;
                     continue;
                 }
+
             } else {
                 if (pv->negative) {
                     pv++;
@@ -208,8 +209,8 @@ ngx_http_proxy_var_set(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     value[1].data++;
 
     if (plcf->vars == NGX_CONF_UNSET_PTR) {
-        plcf->vars = ngx_array_create(cf->pool, 1,
-                                    sizeof(ngx_http_proxy_var_set_variable_t));
+        plcf->vars = ngx_array_create(
+            cf->pool, 1, sizeof(ngx_http_proxy_var_set_variable_t));
         if (plcf->vars == NULL) {
             return NGX_CONF_ERROR;
         }
@@ -266,7 +267,7 @@ ngx_http_proxy_var_set(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
         } else {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                "invalid parameter \"%V\"", &value[3]);
+                               "invalid parameter \"%V\"", &value[3]);
             return NGX_CONF_ERROR;
         }
 
@@ -275,7 +276,7 @@ ngx_http_proxy_var_set(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         ccv.cf = cf;
         ccv.value = &s;
         ccv.complex_value = ngx_palloc(cf->pool,
-                                    sizeof(ngx_http_complex_value_t));
+                                       sizeof(ngx_http_complex_value_t));
         if (ccv.complex_value == NULL) {
             return NGX_CONF_ERROR;
         }
