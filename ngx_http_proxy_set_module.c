@@ -24,29 +24,29 @@ typedef struct {
     ngx_http_complex_value_t  *filter;
     ngx_int_t                  negative;
 #endif
-} ngx_http_proxy_var_set_variable_t;
+} ngx_http_proxy_set_variable_t;
 
 
 typedef struct {
     ngx_array_t               *vars;
-} ngx_http_proxy_var_set_loc_conf_t;
+} ngx_http_proxy_set_loc_conf_t;
 
 
-static char *ngx_http_proxy_var_set(ngx_conf_t *cf, ngx_command_t *cmd,
+static char *ngx_http_proxy_set(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf);
-static ngx_int_t ngx_http_proxy_var_set_filter(ngx_http_request_t *r,
+static ngx_int_t ngx_http_proxy_set_filter(ngx_http_request_t *r,
     ngx_http_proxy_filter_ctx_t *ctx);
-static ngx_int_t ngx_http_proxy_var_set_variable(ngx_http_request_t *r,
+static ngx_int_t ngx_http_proxy_set_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data);
-static void *ngx_http_proxy_var_set_create_loc_conf(ngx_conf_t *cf);
-static char *ngx_http_proxy_var_set_merge_loc_conf(ngx_conf_t *cf,
+static void *ngx_http_proxy_set_create_loc_conf(ngx_conf_t *cf);
+static char *ngx_http_proxy_set_merge_loc_conf(ngx_conf_t *cf,
     void *parent, void *child);
-static ngx_int_t ngx_http_proxy_var_set_init(ngx_conf_t *cf);
+static ngx_int_t ngx_http_proxy_set_init(ngx_conf_t *cf);
 
 
-static ngx_command_t  ngx_http_proxy_var_set_commands[] = {
+static ngx_command_t  ngx_http_proxy_set_commands[] = {
 
-    { ngx_string("proxy_var_set"),
+    { ngx_string("proxy_set"),
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF
 #if (NGX_CONDITION)
                         |NGX_HTTP_MAIN_WHEN_CONF|NGX_HTTP_SRV_WHEN_CONF
@@ -54,7 +54,7 @@ static ngx_command_t  ngx_http_proxy_var_set_commands[] = {
 #else
                         |NGX_CONF_TAKE23,
 #endif
-      ngx_http_proxy_var_set,
+      ngx_http_proxy_set,
       NGX_HTTP_LOC_CONF_OFFSET,
       0,
       NULL },
@@ -63,9 +63,9 @@ static ngx_command_t  ngx_http_proxy_var_set_commands[] = {
 };
 
 
-static ngx_http_module_t  ngx_http_proxy_var_set_module_ctx = {
+static ngx_http_module_t  ngx_http_proxy_set_module_ctx = {
     NULL,                                     /* preconfiguration */
-    ngx_http_proxy_var_set_init,              /* postconfiguration */
+    ngx_http_proxy_set_init,              /* postconfiguration */
 
     NULL,                                     /* create main conf */
     NULL,                                     /* init main conf */
@@ -73,15 +73,15 @@ static ngx_http_module_t  ngx_http_proxy_var_set_module_ctx = {
     NULL,                                     /* create srv conf */
     NULL,                                     /* merge srv conf */
 
-    ngx_http_proxy_var_set_create_loc_conf,   /* create loc conf */
-    ngx_http_proxy_var_set_merge_loc_conf     /* merge loc conf */
+    ngx_http_proxy_set_create_loc_conf,   /* create loc conf */
+    ngx_http_proxy_set_merge_loc_conf     /* merge loc conf */
 };
 
 
-ngx_module_t  ngx_http_proxy_var_set_module = {
+ngx_module_t  ngx_http_proxy_set_module = {
     NGX_MODULE_V1,
-    &ngx_http_proxy_var_set_module_ctx,       /* module context */
-    ngx_http_proxy_var_set_commands,          /* module directives */
+    &ngx_http_proxy_set_module_ctx,       /* module context */
+    ngx_http_proxy_set_commands,          /* module directives */
     NGX_HTTP_MODULE,                          /* module type */
     NULL,                                     /* init master */
     NULL,                                     /* init module */
@@ -95,20 +95,20 @@ ngx_module_t  ngx_http_proxy_var_set_module = {
 
 
 static ngx_int_t
-ngx_http_proxy_var_set_filter(ngx_http_request_t *r,
+ngx_http_proxy_set_filter(ngx_http_request_t *r,
     ngx_http_proxy_filter_ctx_t *ctx)
 {
     ngx_str_t                            val;
     ngx_http_variable_t                 *v;
     ngx_http_variable_value_t           *vv;
-    ngx_http_proxy_var_set_loc_conf_t   *plcf;
-    ngx_http_proxy_var_set_variable_t   *pv, *last;
+    ngx_http_proxy_set_loc_conf_t   *plcf;
+    ngx_http_proxy_set_variable_t   *pv, *last;
     ngx_http_core_main_conf_t           *cmcf;
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "proxy var set filter");
+                   "proxy set filter");
 
-    plcf = ngx_http_get_module_loc_conf(r, ngx_http_proxy_var_set_module);
+    plcf = ngx_http_get_module_loc_conf(r, ngx_http_proxy_set_module);
 
     if (ctx->headers_in == NULL) {
         return NGX_DECLINED;
@@ -187,13 +187,13 @@ ngx_http_proxy_var_set_filter(ngx_http_request_t *r,
 
 
 static char *
-ngx_http_proxy_var_set(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_http_proxy_set(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
-    ngx_http_proxy_var_set_loc_conf_t *plcf = conf;
+    ngx_http_proxy_set_loc_conf_t *plcf = conf;
 
     ngx_str_t                           *value;
     ngx_http_variable_t                 *v;
-    ngx_http_proxy_var_set_variable_t   *pv;
+    ngx_http_proxy_set_variable_t   *pv;
     ngx_str_t                            s;
     ngx_http_compile_complex_value_t     ccv;
 
@@ -210,7 +210,7 @@ ngx_http_proxy_var_set(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     if (plcf->vars == NGX_CONF_UNSET_PTR) {
         plcf->vars = ngx_array_create(
-            cf->pool, 1, sizeof(ngx_http_proxy_var_set_variable_t));
+            cf->pool, 1, sizeof(ngx_http_proxy_set_variable_t));
         if (plcf->vars == NULL) {
             return NGX_CONF_ERROR;
         }
@@ -236,7 +236,7 @@ ngx_http_proxy_var_set(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     }
 
     if (v->get_handler == NULL) {
-        v->get_handler = ngx_http_proxy_var_set_variable;
+        v->get_handler = ngx_http_proxy_set_variable;
         v->data = (uintptr_t) pv;
     }
 
@@ -298,11 +298,11 @@ ngx_http_proxy_var_set(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 static ngx_int_t
-ngx_http_proxy_var_set_variable(ngx_http_request_t *r,
+ngx_http_proxy_set_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "proxy var set variable");
+                   "proxy set variable");
 
     v->not_found = 1;
 
@@ -311,11 +311,11 @@ ngx_http_proxy_var_set_variable(ngx_http_request_t *r,
 
 
 static void *
-ngx_http_proxy_var_set_create_loc_conf(ngx_conf_t *cf)
+ngx_http_proxy_set_create_loc_conf(ngx_conf_t *cf)
 {
-    ngx_http_proxy_var_set_loc_conf_t *conf;
+    ngx_http_proxy_set_loc_conf_t *conf;
 
-    conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_proxy_var_set_loc_conf_t));
+    conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_proxy_set_loc_conf_t));
     if (conf == NULL) {
         return NULL;
     }
@@ -327,13 +327,13 @@ ngx_http_proxy_var_set_create_loc_conf(ngx_conf_t *cf)
 
 
 static char *
-ngx_http_proxy_var_set_merge_loc_conf(ngx_conf_t *cf,
+ngx_http_proxy_set_merge_loc_conf(ngx_conf_t *cf,
     void *parent, void *child)
 {
-    ngx_http_proxy_var_set_loc_conf_t  *prev = parent;
-    ngx_http_proxy_var_set_loc_conf_t  *conf = child;
+    ngx_http_proxy_set_loc_conf_t  *prev = parent;
+    ngx_http_proxy_set_loc_conf_t  *conf = child;
 
-    ngx_http_proxy_var_set_variable_t  *pvars, *cvars, *nvar;
+    ngx_http_proxy_set_variable_t  *pvars, *cvars, *nvar;
     ngx_uint_t                          i, j, found;
     ngx_uint_t                          cvars_nelts;
 
@@ -371,7 +371,7 @@ ngx_http_proxy_var_set_merge_loc_conf(ngx_conf_t *cf,
 
 
 static ngx_int_t
-ngx_http_proxy_var_set_init(ngx_conf_t *cf)
+ngx_http_proxy_set_init(ngx_conf_t *cf)
 {
     ngx_http_proxy_filter_pt          *h;
     ngx_http_proxy_filter_main_conf_t *pmcf;
@@ -387,7 +387,7 @@ ngx_http_proxy_var_set_init(ngx_conf_t *cf)
         return NGX_ERROR;
     }
 
-    *h = ngx_http_proxy_var_set_filter;
+    *h = ngx_http_proxy_set_filter;
 
     return NGX_OK;
 }

@@ -1,6 +1,6 @@
 # Name
 
-`ngx_http_proxy_var_set_module` allows setting variables during the proxy response header phase.
+`ngx_http_proxy_set_module` allows setting variables during the proxy response header phase.
 
 # Table of Content
 
@@ -11,7 +11,7 @@
 - [Installation](#installation)
 - [Conditional syntax](#conditional-syntax)
 - [Directives](#directives)
-  - [proxy\_var\_set](#proxy_var_set)
+  - [proxy\_set](#proxy_set)
 - [Author](#author)
 - [License](#license)
 
@@ -30,7 +30,7 @@ server {
         set $no_cache "";
         condition has_no_cache is_not_empty $upstream_http_custom_header1;
         when has_no_cache {
-            proxy_var_set $no_cache $upstream_http_custom_header1;
+            proxy_set $no_cache $upstream_http_custom_header1;
         }
         proxy_no_cache $no_cache;
         proxy_pass http://example.upstream.com;
@@ -44,20 +44,20 @@ This module depends on `ngx_http_proxy_filter_module`; add the proxy filter modu
 
 ```sh
 ./configure --add-module=/path/to/ngx_http_proxy_filter_module \
-            --add-module=/path/to/ngx_http_proxy_var_set_module
+            --add-module=/path/to/ngx_http_proxy_set_module
 ```
 
 To enable named conditions, add `ngx_condition_module` statically in the same nginx configuration.
 
 # Conditional syntax
 
-Conditional syntax is selected at compile time. With `ngx_condition_module`, place `proxy_var_set` inside an `http`, `server`, or `location` `when` block; `if=` and `if!=` are rejected. Without it, `when` is unavailable and legacy `if=`/`if!=` remain supported. A rule whose condition does not match is skipped so the next definition of the same variable can be evaluated.
+Conditional syntax is selected at compile time. With `ngx_condition_module`, place `proxy_set` inside an `http`, `server`, or `location` `when` block; `if=` and `if!=` are rejected. Without it, `when` is unavailable and legacy `if=`/`if!=` remain supported. A rule whose condition does not match is skipped so the next definition of the same variable can be evaluated.
 
 # Directives
 
-## proxy_var_set
+## proxy_set
 
-**Syntax:** *proxy_var_set $variable value;*
+**Syntax:** *proxy_set $variable value;*
 
 **Default:** *-*
 

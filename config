@@ -1,43 +1,43 @@
-ngx_addon_name=ngx_http_proxy_var_set_module
+ngx_addon_name=ngx_http_proxy_set_module
 
 if [ "$HTTP" = NO ]; then
-    echo "$0: error: ngx_http_proxy_var_set_module requires HTTP"
+    echo "$0: error: ngx_http_proxy_set_module requires HTTP"
     exit 1
 fi
 
 if [ "$HTTP_PROXY" != YES ]; then
-    echo "$0: error: ngx_http_proxy_var_set_module requires HTTP proxy"
+    echo "$0: error: ngx_http_proxy_set_module requires HTTP proxy"
     exit 1
 fi
 
 if test ! -f "$NGX_AUTO_CONFIG_H"                                      \
     || ! grep -q "NGX_HTTP_PROXY_FILTER" "$NGX_AUTO_CONFIG_H"
 then
-    echo "$0: error: ngx_http_proxy_var_set_module requires ngx_http_proxy_filter_module"
-    echo "$0: error: add ngx_http_proxy_filter_module before ngx_http_proxy_var_set_module"
+    echo "$0: error: ngx_http_proxy_set_module requires ngx_http_proxy_filter_module"
+    echo "$0: error: add ngx_http_proxy_filter_module before ngx_http_proxy_set_module"
     exit 1
 fi
 
-PROXY_VAR_SET_INCS="$ngx_addon_dir"
+PROXY_SET_INCS="$ngx_addon_dir"
 
-PROXY_VAR_SET_SRCS="                                                     \
-                $ngx_addon_dir/ngx_http_proxy_var_set_module.c            \
+PROXY_SET_SRCS="                                                     \
+                $ngx_addon_dir/ngx_http_proxy_set_module.c            \
                 "
 
-PROXY_VAR_SET_DEPS=
+PROXY_SET_DEPS=
 
 if test -n "$ngx_module_link"; then
     ngx_module_type=HTTP
     ngx_module_name="$ngx_addon_name"
-    ngx_module_incs="$PROXY_VAR_SET_INCS"
-    ngx_module_deps="$PROXY_VAR_SET_DEPS"
-    ngx_module_srcs="$PROXY_VAR_SET_SRCS"
+    ngx_module_incs="$PROXY_SET_INCS"
+    ngx_module_deps="$PROXY_SET_DEPS"
+    ngx_module_srcs="$PROXY_SET_SRCS"
     ngx_module_libs=
 
     . auto/module
 else
     HTTP_MODULES="$HTTP_MODULES $ngx_addon_name"
-    HTTP_INCS="$HTTP_INCS $PROXY_VAR_SET_INCS"
-    NGX_ADDON_SRCS="$NGX_ADDON_SRCS $PROXY_VAR_SET_SRCS"
-    NGX_ADDON_DEPS="$NGX_ADDON_DEPS $PROXY_VAR_SET_DEPS"
+    HTTP_INCS="$HTTP_INCS $PROXY_SET_INCS"
+    NGX_ADDON_SRCS="$NGX_ADDON_SRCS $PROXY_SET_SRCS"
+    NGX_ADDON_DEPS="$NGX_ADDON_DEPS $PROXY_SET_DEPS"
 fi
