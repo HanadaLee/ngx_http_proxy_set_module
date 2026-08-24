@@ -51,7 +51,9 @@ To enable named conditions, add `ngx_condition_module` statically in the same ng
 
 # Conditional syntax
 
-Conditional syntax is selected at compile time. With `ngx_condition_module`, place `proxy_set` inside an `http`, `server`, or `location` `when` block; `if=` and `if!=` are rejected. Without it, `when` is unavailable and legacy `if=`/`if!=` remain supported. A rule whose condition does not match is skipped so the next definition of the same variable can be evaluated.
+Conditional syntax is selected at compile time. With `ngx_condition_module`, place `proxy_set` inside an `http`, `server`, or `location` `when` block; `if=` and `if!=` are rejected. Without it, `when` is unavailable and legacy `if=`/`if!=` remain supported.
+
+Definitions are evaluated in configuration order. The first unconditional definition or definition with a matching condition wins for each variable. A definition whose condition does not match is skipped so the next definition of the same variable can be evaluated. A conditional definition at a child configuration level retains an inherited definition as its fallback.
 
 # Directives
 

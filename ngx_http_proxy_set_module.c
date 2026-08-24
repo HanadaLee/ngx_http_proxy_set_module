@@ -99,10 +99,13 @@ ngx_http_proxy_set_filter(ngx_http_request_t *r,
     ngx_http_proxy_filter_ctx_t *ctx)
 {
     ngx_str_t                            val;
+    ngx_array_t                          selected;
+    ngx_int_t                           *index;
+    ngx_uint_t                           i;
     ngx_http_variable_t                 *v;
     ngx_http_variable_value_t           *vv;
-    ngx_http_proxy_set_loc_conf_t   *plcf;
-    ngx_http_proxy_set_variable_t   *pv, *last;
+    ngx_http_proxy_set_loc_conf_t        *plcf;
+    ngx_http_proxy_set_variable_t        *pv, *last;
     ngx_http_core_main_conf_t           *cmcf;
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
@@ -118,6 +121,10 @@ ngx_http_proxy_set_filter(ngx_http_request_t *r,
         return NGX_DECLINED;
     }
 
+    if (ngx_array_init(&selected, r->pool, 1, sizeof(ngx_int_t)) != NGX_OK) {
+        return NGX_ERROR;
+    }
+
     cmcf = ngx_http_get_module_main_conf(r, ngx_http_core_module);
     v = cmcf->variables.elts;
 
@@ -125,6 +132,19 @@ ngx_http_proxy_set_filter(ngx_http_request_t *r,
     last = pv + plcf->vars->nelts;
 
     while (pv < last) {
+
+        index = selected.elts;
+
+        for (i = 0; i < selected.nelts; i++) {
+            if (index[i] == pv->index) {
+                break;
+            }
+        }
+
+        if (i < selected.nelts) {
+            pv++;
+            continue;
+        }
 
 #if (NGX_CONDITION)
         if (ngx_http_condition_get_expr_result(r, pv->expr_id)
@@ -165,6 +185,13 @@ ngx_http_proxy_set_filter(ngx_http_request_t *r,
             return NGX_ERROR;
         }
 
+        index = ngx_array_push(&selected);
+        if (index == NULL) {
+            return NGX_ERROR;
+        }
+
+        *index = pv->index;
+
         vv->valid = 1;
         vv->not_found = 0;
         vv->data = val.data;
@@ -193,8 +220,10 @@ ngx_http_proxy_set(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     ngx_str_t                           *value;
     ngx_http_variable_t                 *v;
-    ngx_http_proxy_set_variable_t   *pv;
+    ngx_http_proxy_set_variable_t       *pv;
+#if !(NGX_CONDITION)
     ngx_str_t                            s;
+#endif
     ngx_http_compile_complex_value_t     ccv;
 
     value = cf->args->elts;
@@ -349,10 +378,22 @@ ngx_http_proxy_set_merge_loc_conf(ngx_conf_t *cf,
             found = 0;
 
             for (j = 0; j < cvars_nelts; j++) {
-                if (cvars[j].index == pvars[i].index) {
-                    found = 1;
-                    break;
+                if (cvars[j].index != pvars[i].index) {
+                    continue;
                 }
+
+#if (NGX_CONDITION)
+                if (cvars[j].expr_id != NGX_CONDITION_NO_EXPR_ID) {
+                    continue;
+                }
+#else
+                if (cvars[j].filter != NULL) {
+                    continue;
+                }
+#endif
+
+                found = 1;
+                break;
             }
 
             if (!found) {
