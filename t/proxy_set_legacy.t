@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Tests for legacy proxy_set predicates without ngx_condition_module.
+# Tests for legacy proxy_set predicates without ngx_expr_module.
 
 ###############################################################################
 
@@ -22,7 +22,7 @@ my $t = Test::Nginx->new()->has(qw/http proxy rewrite
 	ngx_http_proxy_filter_module ngx_http_proxy_set_module/);
 
 plan(skip_all => 'legacy predicate build required')
-	if $t->has_module('ngx_condition_module');
+	if $t->has_module('ngx_expr_module');
 
 $t->plan(8);
 

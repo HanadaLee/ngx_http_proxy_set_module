@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Tests for proxy_set with ngx_condition_module.
+# Tests for proxy_set with ngx_expr_module.
 
 ###############################################################################
 
@@ -18,7 +18,7 @@ use Test::Nginx qw/ :DEFAULT /;
 select STDERR; $| = 1;
 select STDOUT; $| = 1;
 
-my $t = Test::Nginx->new()->has(qw/http proxy rewrite ngx_condition_module
+my $t = Test::Nginx->new()->has(qw/http proxy rewrite ngx_expr_module
 	ngx_http_proxy_filter_module ngx_http_proxy_set_module/)->plan(17);
 
 $t->write_file_expand('nginx.conf', <<'EOF');
@@ -49,8 +49,8 @@ http {
         listen       127.0.0.1:8080;
         server_name  localhost;
 
-        condition special str_eq $arg_mode special;
-        condition upstream_special str_eq $upstream_http_x_source special;
+        expr special str_eq $arg_mode special;
+        expr upstream_special str_eq $upstream_http_x_source special;
 
         location = /basic {
             set $existing initial;
@@ -104,7 +104,7 @@ http {
         listen       127.0.0.1:8082;
         server_name  inheritance;
 
-        condition child_selected str_eq $arg_mode special;
+        expr child_selected str_eq $arg_mode special;
 
         set $inherited initial;
         set $unrelated initial;

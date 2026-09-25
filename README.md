@@ -28,7 +28,7 @@ server {
 
     location / {
         set $no_cache "";
-        condition has_no_cache is_not_empty $upstream_http_custom_header1;
+        expr has_no_cache !is_empty $upstream_http_custom_header1;
         when has_no_cache {
             proxy_set $no_cache $upstream_http_custom_header1;
         }
@@ -47,11 +47,11 @@ This module depends on `ngx_http_proxy_filter_module`; add the proxy filter modu
             --add-module=/path/to/ngx_http_proxy_set_module
 ```
 
-To enable named conditions, add `ngx_condition_module` statically in the same nginx configuration.
+To enable named conditions, add `ngx_expr_module` statically in the same nginx configuration.
 
 # Conditional syntax
 
-Conditional syntax is selected at compile time. With `ngx_condition_module`, place `proxy_set` inside an `http`, `server`, or `location` `when` block; `if=` and `if!=` are rejected. Without it, `when` is unavailable and legacy `if=`/`if!=` remain supported.
+Conditional syntax is selected at compile time. With `ngx_expr_module`, place `proxy_set` inside an `http`, `server`, or `location` `when` block; `if=` and `if!=` are rejected. Without it, `when` is unavailable and legacy `if=`/`if!=` remain supported.
 
 Definitions are evaluated in configuration order. The first unconditional definition or definition with a matching condition wins for each variable. A definition whose condition does not match is skipped so the next definition of the same variable can be evaluated. A conditional definition at a child configuration level retains an inherited definition as its fallback.
 
