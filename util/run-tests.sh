@@ -35,8 +35,12 @@ fi
 configure_args+=(--add-module="$module_root/.ci/ngx_http_proxy_filter_module")
 configure_args+=(--add-module="$module_root")
 
+bash "$module_root/.ci/ngx_http_proxy_filter_module/util/apply-nginx-patches.sh" "$nginx_source"
+
 cd "$nginx_source"
-sh ./configure "${configure_args[@]}"
+configure=./configure
+[[ -f "$configure" ]] || configure=auto/configure
+sh "$configure" "${configure_args[@]}"
 make -j"$build_jobs"
 
 export TEST_NGINX_BINARY="$nginx_source/objs/nginx"

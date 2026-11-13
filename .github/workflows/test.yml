@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
     inputs:
       nginx_ref:
-        description: nginx-ext branch, tag or commit
-        default: '1.31.7'
+        description: nginx branch, tag or commit
+        default: 'release-1.31.8'
         required: true
         type: string
 
@@ -33,11 +33,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check out nginx-ext
+      - name: Check out nginx
         uses: actions/checkout@v6
         with:
-          repository: HanadaLee/nginx-ext
-          ref: ${{ inputs.nginx_ref || '1.31.7' }}
+          repository: nginx/nginx
+          ref: ${{ inputs.nginx_ref || 'release-1.31.8' }}
           path: .ci/nginx
           persist-credentials: false
 
