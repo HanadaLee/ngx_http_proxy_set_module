@@ -40,6 +40,8 @@ server {
 
 # Installation
 
+
+This module must be built statically with `--add-module`.
 This module depends on `ngx_http_proxy_filter_module`; add the proxy filter module first:
 
 ```sh

@@ -1,5 +1,10 @@
 ngx_addon_name=ngx_http_proxy_set_module
 
+if [ "$ngx_module_link" = DYNAMIC ]; then
+    echo "$0: error: ngx_http_proxy_set_module must be built with --add-module"
+    exit 1
+fi
+
 if [ "$HTTP" = NO ]; then
     echo "$0: error: ngx_http_proxy_set_module requires HTTP"
     exit 1
